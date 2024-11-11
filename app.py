@@ -73,7 +73,7 @@ if arquivo_atualizacao is not None:
     if tipo_sondagem != 'SEBRAE':
         df_mailing = load_mailing(arquivo_atualizacao)
         df_mailing['Data de Referência'] = data_referencia
-        df_mailing_historico = pd.read_excel(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx', sheet_name = "Mailing", dtype={'CNAE Princ': str}, parse_dates=['Data de Referência'])
+        df_mailing_historico = pd.read_excel(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização/5. Projetos/22. Produção dos Pesquisadores/1. Dados/Histórico/historico_{tipo_sondagem}.xlsx', sheet_name = "Mailing", dtype={'CNAE Princ': str}, parse_dates=['Data de Referência'])
         df_mailing_historico['Data de Referência'] = df_mailing_historico['Data de Referência'].dt.date
         df_mailing_atual = pd.concat([df_mailing_historico, df_mailing])
         df_mailing_atual.drop_duplicates(inplace = True)
@@ -81,7 +81,7 @@ if arquivo_atualizacao is not None:
 
     df_placar = load_placar(arquivo_atualizacao)
     df_placar['Data de Referência'] = data_referencia
-    df_placar_historico = pd.read_excel(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx', sheet_name = "Placar")
+    df_placar_historico = pd.read_excel(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização/5. Projetos/22. Produção dos Pesquisadores/1. Dados/Histórico/historico_{tipo_sondagem}.xlsx', sheet_name = "Placar")
     df_placar_historico['Data de Referência'] = df_placar_historico['Data de Referência'].dt.date
     df_placar_atual = pd.concat([df_placar_historico, df_placar])
     df_placar_atual.drop_duplicates(inplace = True)
@@ -89,7 +89,7 @@ if arquivo_atualizacao is not None:
     
     df_telefone = load_telefone(arquivo_atualizacao)
     df_telefone['Data'] = df_telefone['Data'].dt.date
-    df_telefone_historico = pd.read_excel(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx', sheet_name = "Telefone", parse_dates=['Data'])
+    df_telefone_historico = pd.read_excel(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização/5. Projetos/22. Produção dos Pesquisadores/1. Dados/Histórico/historico_{tipo_sondagem}.xlsx', sheet_name = "Telefone", parse_dates=['Data'])
     df_telefone_historico['Data'] = df_telefone_historico['Data'].dt.date
     df_telefone_atual = pd.concat([df_telefone_historico, df_telefone])
     df_telefone_atual.drop_duplicates(inplace = True)
@@ -97,7 +97,7 @@ if arquivo_atualizacao is not None:
     
     df_meta = load_meta(arquivo_atualizacao)
     df_meta['Data de Referência'] = data_referencia
-    df_meta_historico = pd.read_excel(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx', sheet_name = "Meta", parse_dates=['Data de Referência'])
+    df_meta_historico = pd.read_excel(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização/5. Projetos/22. Produção dos Pesquisadores/1. Dados/Histórico/historico_{tipo_sondagem}.xlsx', sheet_name = "Meta", parse_dates=['Data de Referência'])
     df_meta_historico['Data de Referência'] = df_meta_historico['Data de Referência'].dt.date
     df_meta_atual = pd.concat([df_meta_historico, df_meta])
     df_meta_atual.drop_duplicates(inplace = True)
@@ -123,7 +123,7 @@ if arquivo_atualizacao is not None:
 
     # Cria o botão
     if st.button('Clique aqui para atualizar o histórico'):
-        with pd.ExcelWriter(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx') as writer:
+        with pd.ExcelWriter(f'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização/5. Projetos/22. Produção dos Pesquisadores/1. Dados/Histórico/historico_{tipo_sondagem}.xlsx') as writer:
             if tipo_sondagem != 'SEBRAE':
                 df_mailing_atual.to_excel(writer, sheet_name='Mailing', index=False)
             df_placar_atual.to_excel(writer, sheet_name='Placar', index=False)
