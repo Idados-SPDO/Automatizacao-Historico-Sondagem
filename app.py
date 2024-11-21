@@ -31,14 +31,15 @@ with st.expander("Dados necessários"):
 st.write('')
 
 tipo_sondagem = st.selectbox("**Sondagem**", options=["Comércio", "Construção", "Consumidor", "Indústria", "SEBRAE", "Serviços"])
+arquivo_historico = st.file_uploader("**Carregue aqui o histórico**", type="xlsx")
 
 # Crio um container para 'encapsular' itens dentro de uma parte da tela.
 container = st.container()
 
 # Solicito que o usuário selecione uma data e imprimo na tela a data selecionada.
 container.subheader('Defina a data de referência e selecione o arquivo para atualizar o histórico:', divider="rainbow")
-data_referencia = container.date_input("", value=None, format="DD/MM/YYYY")
-arquivo_atualizacao = st.file_uploader("arquivo_atualizacao", type="xlsx", label_visibility="hidden")
+data_referencia = container.date_input("**Selecione a data de referência**", value=None, format="DD/MM/YYYY")
+arquivo_atualizacao = st.file_uploader("**Carregue aqui o arquivo atual**", type="xlsx")
 
 if data_referencia:
     # Alterar o dia para o primeiro dia do mês
@@ -73,7 +74,7 @@ if arquivo_atualizacao is not None:
     if tipo_sondagem != 'SEBRAE':
         df_mailing = load_mailing(arquivo_atualizacao)
         df_mailing['Data de Referência'] = data_referencia
-        df_mailing_historico = pd.read_excel(fr'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx', sheet_name = "Mailing", dtype={'CNAE Princ': str}, parse_dates=['Data de Referência'])
+        df_mailing_historico = pd.read_excel(arquivo_historico, sheet_name = "Mailing", dtype={'CNAE Princ': str}, parse_dates=['Data de Referência'])
         df_mailing_historico['Data de Referência'] = df_mailing_historico['Data de Referência'].dt.date
         df_mailing_atual = pd.concat([df_mailing_historico, df_mailing])
         df_mailing_atual.drop_duplicates(inplace = True)
@@ -81,7 +82,7 @@ if arquivo_atualizacao is not None:
 
     df_placar = load_placar(arquivo_atualizacao)
     df_placar['Data de Referência'] = data_referencia
-    df_placar_historico = pd.read_excel(fr'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx', sheet_name = "Placar")
+    df_placar_historico = pd.read_excel(arquivo_historico, sheet_name = "Placar")
     df_placar_historico['Data de Referência'] = df_placar_historico['Data de Referência'].dt.date
     df_placar_atual = pd.concat([df_placar_historico, df_placar])
     df_placar_atual.drop_duplicates(inplace = True)
@@ -89,7 +90,7 @@ if arquivo_atualizacao is not None:
     
     df_telefone = load_telefone(arquivo_atualizacao)
     df_telefone['Data'] = df_telefone['Data'].dt.date
-    df_telefone_historico = pd.read_excel(fr'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx', sheet_name = "Telefone", parse_dates=['Data'])
+    df_telefone_historico = pd.read_excel(arquivo_historico, sheet_name = "Telefone", parse_dates=['Data'])
     df_telefone_historico['Data'] = df_telefone_historico['Data'].dt.date
     df_telefone_atual = pd.concat([df_telefone_historico, df_telefone])
     df_telefone_atual.drop_duplicates(inplace = True)
@@ -97,7 +98,7 @@ if arquivo_atualizacao is not None:
     
     df_meta = load_meta(arquivo_atualizacao)
     df_meta['Data de Referência'] = data_referencia
-    df_meta_historico = pd.read_excel(fr'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx', sheet_name = "Meta", parse_dates=['Data de Referência'])
+    df_meta_historico = pd.read_excel(arquivo_historico, sheet_name = "Meta", parse_dates=['Data de Referência'])
     df_meta_historico['Data de Referência'] = df_meta_historico['Data de Referência'].dt.date
     df_meta_atual = pd.concat([df_meta_historico, df_meta])
     df_meta_atual.drop_duplicates(inplace = True)
@@ -123,10 +124,22 @@ if arquivo_atualizacao is not None:
 
     # Cria o botão
     if st.button('Clique aqui para atualizar o histórico'):
-        with pd.ExcelWriter(fr'\\fgvfsbi\ibre-sci-sapc\Otimização e Automatização\5. Projetos\22. Produção dos Pesquisadores\1. Dados\Histórico\historico_{tipo_sondagem}.xlsx') as writer:
+        # Criar um buffer em memória para salvar o arquivo Excel
+        buffer = BytesIO()
+        with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
             if tipo_sondagem != 'SEBRAE':
                 df_mailing_atual.to_excel(writer, sheet_name='Mailing', index=False)
             df_placar_atual.to_excel(writer, sheet_name='Placar', index=False)
             df_telefone_atual.to_excel(writer, sheet_name='Telefone', index=False)
             df_meta_atual.to_excel(writer, sheet_name='Meta', index=False)
-            st.warning(f'Histórico **{tipo_sondagem}** atualizado com sucesso :)')
+    
+        # Salvar o buffer
+        buffer.seek(0)
+    
+        # Gerar o botão de download
+        st.download_button(
+            label=f'Baixar Histórico {tipo_sondagem}',
+            data=buffer,
+            file_name=f'historico_{tipo_sondagem}.xlsx',
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
